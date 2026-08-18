@@ -7,10 +7,10 @@
     <style>
         body { font-family: 'Comic Sans MS', cursive, sans-serif; background-color: #f0f8ff; color: #333; margin: 0; padding: 5px; text-align: center; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* Menú Principal */
+        /* Menú */
         #selection-screen { margin-top: 10px; }
         .char-btn { font-size: 35px; padding: 10px 15px; margin: 5px; cursor: pointer; border-radius: 10px; border: 2px solid #b0c4de; background: white; }
-        .menu-btn { font-size: 20px; padding: 15px 30px; margin: 10px; cursor: pointer; border-radius: 15px; border: 2px solid #4CAF50; background: #e8f5e9; font-weight: bold; }
+        .menu-btn { font-size: 18px; padding: 10px 20px; margin: 10px; cursor: pointer; border-radius: 15px; border: 2px solid #4CAF50; background: #e8f5e9; font-weight: bold; }
 
         /* Pantalla Juego */
         #game-screen { display: none; height: 95vh; flex-direction: column; }
@@ -38,14 +38,14 @@
     <h1>Aventuras de Programación</h1>
 
     <div id="selection-screen">
-        <h2>Elige tu personaje:</h2>
+        <h2>¿Con quién quieres jugar hoy?</h2>
         <button class="char-btn" onclick="selectChar('🤖', '🔋')">🤖</button>
         <button class="char-btn" onclick="selectChar('🐱', '🐟')">🐱</button>
         <button class="char-btn" onclick="selectChar('🐶', '🦴')">🐶</button>
         <button class="char-btn" onclick="selectChar('👽', '🛸')">👽</button>
         <button class="char-btn" onclick="selectChar('🦄', '🌈')">🦄</button>
         <button class="char-btn" onclick="selectChar('🦖', '🥩')">🦖</button>
-        <div style="margin-top: 20px;">
+        <div>
             <button class="menu-btn" onclick="initGame(false)">▶️ JUGAR NIVELES</button>
             <button class="menu-btn" onclick="initGame(true)" style="border-color:#9c27b0; background:#f3e5f5;">🛠️ MODO CREADOR</button>
         </div>
@@ -72,7 +72,7 @@
                     <button onclick="addCommand('DERECHA')">➡️ Der</button>
                     <button onclick="deleteLastCommand()" style="background:#ff9800; grid-column: span 2;">🔙 Borrar</button>
                 </div>
-                <button onclick="runCommands()" style="background:#008CBA; padding:10px; margin-top:5px;">▶️ EJECUTAR</button>
+                <button onclick="runCommands()" style="background:#008CBA; padding:10px; margin-top:10px;">▶️ EJECUTAR</button>
                 <button onclick="location.reload()" style="background:#607d8b; margin-top:5px;">🏠 Menú Principal</button>
             </div>
             <div class="board-container">
@@ -86,61 +86,36 @@
         let pChar='🤖', gChar='🔋', totalScore=0, collected=0, isCreator=false, currentTool='player', curLvl=0;
         let pPos={x:0,y:0}, gPos={x:0,y:0}, obs=[], coins=[], cmds=[], isRunning=false;
 
-        function selectChar(c, g) { pChar=c; gChar=g; document.getElementById('tool-player').innerText=c; document.getElementById('tool-goal').innerText=g; }
-        function initGame(creator) { isCreator=creator; document.getElementById('selection-screen').style.display='none'; document.getElementById('game-screen').style.display='flex'; isCreator ? enterCreator() : loadLevel(); }
+        const levels = [
+            {title:"Nivel 1: Inicio",size:5,s:{x:0,y:4},g:{x:4,y:0},o:[],c:[{x:2,y:2}]},
+            {title:"Nivel 2: La roca",size:5,s:{x:0,y:4},g:{x:4,y:0},o:[{x:2,y:2}],c:[{x:1,y:2},{x:3,y:2}]},
+            {title:"Nivel 3: El muro",size:6,s:{x:0,y:5},g:{x:5,y:0},o:[{x:2,y:1},{x:2,y:2},{x:2,y:3},{x:2,y:4}],c:[{x:1,y:0},{x:3,y:5}]},
+            {title:"Nivel 4: S",size:6,s:{x:0,y:0},g:{x:5,y:5},o:[{x:1,y:0},{x:1,y:1},{x:1,y:2},{x:3,y:5},{x:3,y:4},{x:3,y:3}],c:[{x:2,y:0},{x:2,y:5}]},
+            {title:"Nivel 5: U",size:6,s:{x:2,y:5},g:{x:2,y:1},o:[{x:1,y:2},{x:1,y:3},{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:3,y:3},{x:3,y:2}],c:[{x:0,y:0},{x:4,y:0}]},
+            {title:"Nivel 6: Puertas",size:6,s:{x:0,y:3},g:{x:5,y:3},o:[{x:2,y:0},{x:2,y:1},{x:2,y:4},{x:2,y:5},{x:4,y:1},{x:4,y:2},{x:4,y:4},{x:4,y:5}],c:[{x:2,y:2},{x:4,y:3}]},
+            {title:"Nivel 7: Pasillo",size:7,s:{x:0,y:6},g:{x:6,y:0},o:[{x:1,y:1},{x:1,y:2},{x:1,y:3},{x:1,y:4},{x:1,y:5},{x:5,y:1},{x:5,y:2},{x:5,y:3},{x:5,y:4},{x:5,y:5}],c:[{x:3,y:1},{x:3,y:5}]},
+            {title:"Nivel 8: ZigZag",size:7,s:{x:0,y:0},g:{x:6,y:6},o:[{x:1,y:0},{x:1,y:1},{x:1,y:2},{x:3,y:6},{x:3,y:5},{x:3,y:4},{x:5,y:0},{x:5,y:1},{x:5,y:2}],c:[{x:2,y:3},{x:4,y:3}]},
+            {title:"Nivel 9: Caracol",size:7,s:{x:0,y:6},g:{x:3,y:3},o:[{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4},{x:5,y:4},{x:5,y:3},{x:5,y:2},{x:4,y:2},{x:3,y:2},{x:2,y:2},{x:2,y:3}],c:[{x:0,y:0},{x:6,y:0},{x:6,y:6}]},
+            {title:"Nivel 10: Cruce",size:7,s:{x:3,y:6},g:{x:3,y:0},o:[{x:2,y:2},{x:2,y:3},{x:2,y:4},{x:4,y:2},{x:4,y:3},{x:4,y:4},{x:3,y:2},{x:3,y:4}],c:[{x:0,y:3},{x:6,y:3}]},
+            {title:"Nivel 11: Caminos",size:7,s:{x:0,y:3},g:{x:6,y:3},o:[{x:2,y:3},{x:3,y:3},{x:4,y:3}],c:[{x:3,y:0},{x:3,y:6}]},
+            {title:"Nivel 12: Diagonal",size:7,s:{x:0,y:6},g:{x:6,y:0},o:[{x:1,y:5},{x:2,y:4},{x:3,y:3},{x:4,y:2},{x:5,y:1}],c:[{x:1,y:6},{x:6,y:1}]},
+            {title:"Nivel 13: Lluvia",size:7,s:{x:0,y:3},g:{x:6,y:3},o:[{x:1,y:1},{x:1,y:5},{x:2,y:3},{x:3,y:1},{x:3,y:5},{x:4,y:3},{x:5,y:1},{x:5,y:5}],c:[{x:2,y:1},{x:4,y:5}]},
+            {title:"Nivel 14: Prisión",size:7,s:{x:3,y:3},g:{x:6,y:6},o:[{x:2,y:2},{x:3,y:2},{x:4,y:2},{x:2,y:3},{x:4,y:3},{x:2,y:4},{x:3,y:4},{x:4,y:4}],c:[{x:0,y:0},{x:6,y:0}]},
+            {title:"Nivel 15: Final",size:7,s:{x:0,y:0},g:{x:6,y:6},o:[{x:0,y:1},{x:1,y:1},{x:2,y:1},{x:4,y:0},{x:4,y:1},{x:4,y:2},{x:4,y:3},{x:2,y:3},{x:2,y:4},{x:2,y:5},{x:3,y:5},{x:4,y:5},{x:6,y:5},{x:6,y:4}],c:[{x:0,y:6},{x:6,y:0},{x:3,y:3}]}
+        ];
 
-        function enterCreator() {
-            document.getElementById('level-title').innerText="🛠️ Modo Creador";
-            document.getElementById('creator-tools').style.display='block';
-            boardSize=7; pPos={x:0,y:6}; gPos={x:6,y:0}; obs=[]; coins=[]; cmds=[];
-            setupBoard(7); draw();
-        }
-
-        function loadLevel() {
-            const lvl = [{title:"Nivel 1",size:5,s:{x:0,y:4},g:{x:4,y:0},o:[],c:[{x:2,y:2}]},{title:"Nivel 2",size:5,s:{x:0,y:4},g:{x:4,y:0},o:[{x:2,y:2}],c:[{x:1,y:2},{x:3,y:2}]},{title:"Nivel 3",size:6,s:{x:0,y:5},g:{x:5,y:0},o:[{x:2,y:1},{x:2,y:2},{x:2,y:3},{x:2,y:4}],c:[{x:1,y:0},{x:3,y:5}]}][curLvl];
-            document.getElementById('level-title').innerText=lvl.title;
-            boardSize=lvl.size; pPos={...lvl.s}; gPos={...lvl.g}; obs=[...lvl.o]; coins=[...lvl.c]; collected=0; cmds=[];
-            setupBoard(boardSize); draw();
-        }
-
-        function setupBoard(s) { const b=document.getElementById('game-board'); b.style.gridTemplateColumns=`repeat(${s}, 45px)`; b.style.gridTemplateRows=`repeat(${s}, 45px)`; }
-        function draw(crash=false) {
-            const b=document.getElementById('game-board'); b.innerHTML='';
-            for(let y=0;y<boardSize;y++){ for(let x=0;x<boardSize;x++){
-                let c=document.createElement('div'); c.className='cell'; c.onclick=()=>handle(x,y);
-                if(x===pPos.x && y===pPos.y) c.innerHTML=crash?'💥':pChar;
-                else if(x===gPos.x && y===gPos.y) c.innerHTML=gChar;
-                else if(obs.some(o=>o.x===x && o.y===y)) c.innerHTML='🪨';
-                else if(coins.some(i=>i.x===x && i.y===y)) c.innerHTML='⭐';
-                b.appendChild(c);
-            }}
-        }
-
-        function handle(x, y) { if(!isCreator || isRunning) return; obs=obs.filter(o=>o.x!==x||o.y!==y); coins=coins.filter(i=>i.x!==x||i.y!==y); if(currentTool==='player') pPos={x,y}; else if(currentTool==='goal') gPos={x,y}; else if(currentTool==='rock') obs.push({x,y}); else if(currentTool==='star') coins.push({x,y}); draw(); }
-        function setTool(t) { currentTool=t; document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active')); document.getElementById('tool-'+t).classList.add('active'); }
-        function addCommand(c) { if(!isRunning) { cmds.push(c); document.getElementById('commands').innerText=cmds.map(x=>{'ARRIBA':'⬆️','ABAJO':'⬇️','IZQUIERDA':'⬅️','DERECHA':'➡️'}[x]).join(' '); } }
-        function deleteLastCommand() { cmds.pop(); updateDisplay(); }
-        function updateDisplay() { document.getElementById('commands').innerText=cmds.map(x=>{'ARRIBA':'⬆️','ABAJO':'⬇️','IZQUIERDA':'⬅️','DERECHA':'➡️'}[x]).join(' '); }
-
-        function runCommands() {
-            if(cmds.length===0 || isRunning) return;
-            isRunning=true; let i=0;
-            let int=setInterval(()=>{
-                if(i>=cmds.length){ clearInterval(int); checkWin(); return; }
-                let c=cmds[i], nx=pPos.x, ny=pPos.y;
-                if(c==='ARRIBA') ny--; if(c==='ABAJO') ny++; if(c==='IZQUIERDA') nx--; if(c==='DERECHA') nx++;
-                if(nx<0||nx>=boardSize||ny<0||ny>=boardSize||obs.some(o=>o.x===nx&&o.y===ny)){ clearInterval(int); draw(true); setTimeout(()=>{isRunning=false; isCreator ? (pPos={x:0,y:6}) : loadLevel(); draw();}, 800); return; }
-                pPos={x:nx,y:ny}; let ci=coins.findIndex(c=>c.x===pPos.x&&c.y===pPos.y); if(ci!==-1){ coins.splice(ci,1); collected++; document.getElementById('score-display').innerText=totalScore+collected; }
-                draw(); i++;
-            }, 400);
-        }
-
-        function checkWin() {
-            if(pPos.x===gPos.x && pPos.y===gPos.y){ 
-                const m=document.getElementById('feedback-modal'); m.style.display='flex'; m.innerText='¡Ganaste!';
-                setTimeout(()=>{ m.style.display='none'; if(!isCreator && curLvl<2){ curLvl++; loadLevel(); } else { alert('¡Nivel completado!'); isRunning=false; } }, 1000);
-            } else { alert('No llegaste'); isRunning=false; isCreator ? (pPos={x:0,y:6}) : loadLevel(); }
-        }
+        function selectChar(c,g){pChar=c;gChar=g;document.getElementById('tool-player').innerText=c;document.getElementById('tool-goal').innerText=g;}
+        function initGame(creator){isCreator=creator;document.getElementById('selection-screen').style.display='none';document.getElementById('game-screen').style.display='flex';isCreator?enterCreator():loadLevel();}
+        function enterCreator(){document.getElementById('level-title').innerText="🛠️ Editor";document.getElementById('creator-tools').style.display='block';curLvl=0;setupBoard(7);draw();}
+        function loadLevel(){const l=levels[curLvl];document.getElementById('level-title').innerText=l.title;pPos={...l.s};gPos={...l.g};obs=[...l.o];coins=[...l.c];collected=0;cmds=[];document.getElementById('commands').innerText='';document.getElementById('score-display').innerText=totalScore;setupBoard(l.size);draw();}
+        function setupBoard(sz){const b=document.getElementById('game-board');b.style.gridTemplateColumns=`repeat(${sz}, 45px)`;b.style.gridTemplateRows=`repeat(${sz}, 45px)`;}
+        function draw(crash=false){const b=document.getElementById('game-board');b.innerHTML='';for(let y=0;y<(isCreator?7:levels[curLvl].size);y++){for(let x=0;x<(isCreator?7:levels[curLvl].size);x++){let c=document.createElement('div');c.className='cell';c.onclick=()=>handle(x,y);if(x===pPos.x&&y===pPos.y)c.innerHTML=crash?'💥':pChar;else if(x===gPos.x&&y===gPos.y)c.innerHTML=gChar;else if(obs.some(o=>o.x===x&&o.y===y))c.innerHTML='🪨';else if(coins.some(i=>i.x===x&&i.y===y))c.innerHTML='⭐';b.appendChild(c);}}}
+        function handle(x,y){if(!isCreator||isRunning)return;obs=obs.filter(o=>o.x!==x||o.y!==y);coins=coins.filter(i=>i.x!==x||i.y!==y);if(currentTool==='player')pPos={x,y};else if(currentTool==='goal')gPos={x,y};else if(currentTool==='rock')obs.push({x,y});else if(currentTool==='star')coins.push({x,y});draw();}
+        function setTool(t){currentTool=t;document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tool-'+t).classList.add('active');}
+        function addCommand(c){if(!isRunning){cmds.push(c);document.getElementById('commands').innerText=cmds.map(x=>{'ARRIBA':'⬆️','ABAJO':'⬇️','IZQUIERDA':'⬅️','DERECHA':'➡️'}[x]).join(' ');}}
+        function deleteLastCommand(){cmds.pop();document.getElementById('commands').innerText=cmds.map(x=>{'ARRIBA':'⬆️','ABAJO':'⬇️','IZQUIERDA':'⬅️','DERECHA':'➡️'}[x]).join(' ');}
+        function runCommands(){if(cmds.length===0||isRunning)return;isRunning=true;let i=0;let int=setInterval(()=>{if(i>=cmds.length){clearInterval(int);checkWin();return;}let c=cmds[i],nx=pPos.x,ny=pPos.y;if(c==='ARRIBA')ny--;if(c==='ABAJO')ny++;if(c==='IZQUIERDA')nx--;if(c==='DERECHA')nx++;let sz=isCreator?7:levels[curLvl].size;if(nx<0||nx>=sz||ny<0||ny>=sz||obs.some(o=>o.x===nx&&o.y===ny)){clearInterval(int);draw(true);setTimeout(()=>{isRunning=false;isCreator?pPos={x:0,y:6}:loadLevel();draw();},800);return;}pPos={x:nx,y:ny};let ci=coins.findIndex(i=>i.x===pPos.x&&i.y===pPos.y);if(ci!==-1){coins.splice(ci,1);collected++;document.getElementById('score-display').innerText=totalScore+collected;}draw();i++;},400);}
+        function checkWin(){if(pPos.x===gPos.x && pPos.y===gPos.y){const m=document.getElementById('feedback-modal');m.style.display='flex';m.innerText='¡Ganaste!';setTimeout(()=>{m.style.display='none';if(!isCreator&&curLvl<levels.length-1){curLvl++;loadLevel();}else{alert('¡Completado!');isRunning=false;}},1000);}else{alert('No llegaste');isRunning=false;isCreator?pPos={x:0,y:6}:loadLevel();draw();}}
     </script>
 </body>
 </html>
