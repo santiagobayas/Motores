@@ -25,7 +25,6 @@
         .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         button { cursor: pointer; border-radius: 8px; border: none; background-color: #4CAF50; color: white; font-weight: bold; padding: 10px; font-size: 16px; }
         
-        /* Aumentamos el tamaño de la grilla y las celdas aquí */
         #game-board { display: grid; gap: 4px; justify-content: center; }
         .cell { width: 65px; height: 65px; background-color: #fff; border: 2px solid #b0c4de; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 40px; user-select: none; }
         
@@ -144,6 +143,7 @@
             document.getElementById('level-title').innerText = "🛠️ Editor Libre";
             document.getElementById('creator-tools').style.display = 'block';
             pPos = {x:0, y:6}; gPos = {x:6, y:0}; obs = []; coins = []; cmds = [];
+            isRunning = false; // <-- CORRECCIÓN APLICADA AQUÍ
             creatorStartP = {...pPos}; creatorStartG = {...gPos}; creatorStartObs = []; creatorStartCoins = [];
             updateDisplay(); setupBoard(7); draw();
         }
@@ -154,6 +154,7 @@
             pPos = {...l.s}; gPos = {...l.g};
             obs = JSON.parse(JSON.stringify(l.o)); coins = JSON.parse(JSON.stringify(l.c));
             collected = 0; cmds = [];
+            isRunning = false; // <-- ¡Y LA CORRECCIÓN PRINCIPAL AQUÍ! Desbloquea los botones al cargar nivel.
             document.getElementById('score-display').innerText = totalScore;
             updateDisplay(); setupBoard(l.size); draw();
         }
@@ -171,7 +172,6 @@
 
         function setupBoard(sz) {
             const b = document.getElementById('game-board');
-            // AQUÍ ES DONDE AUMENTAMOS A 65px
             b.style.gridTemplateColumns = `repeat(${sz}, 65px)`;
             b.style.gridTemplateRows = `repeat(${sz}, 65px)`;
         }
