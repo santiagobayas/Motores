@@ -5,31 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aventuras de Programación</title>
     <style>
-        body { font-family: 'Comic Sans MS', cursive, sans-serif; text-align: center; background-color: #f0f8ff; color: #333; margin: 0; padding: 20px; }
-        h1 { color: #2c3e50; margin-bottom: 5px; }
-        h2 { color: #d35400; margin-top: 0; font-size: 22px; }
+        body { font-family: 'Comic Sans MS', cursive, sans-serif; background-color: #f0f8ff; color: #333; margin: 0; padding: 5px; text-align: center; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        #selection-screen { display: block; margin-top: 50px; }
-        .char-btn { font-size: 50px; padding: 20px; margin: 10px; cursor: pointer; border-radius: 15px; border: 3px solid #b0c4de; background: white; transition: transform 0.2s; }
-        .char-btn:hover { transform: scale(1.1); border-color: #4CAF50; }
+        /* Selección */
+        #selection-screen { margin-top: 10px; }
+        .char-btn { font-size: 35px; padding: 10px 15px; margin: 5px; cursor: pointer; border-radius: 10px; border: 2px solid #b0c4de; background: white; }
+        
+        /* Juego */
+        #game-screen { display: none; height: 95vh; display: flex; flex-direction: column; }
+        .header-bar { background: #ffe0b2; padding: 5px 15px; border-radius: 10px; font-weight: bold; font-size: 18px; border: 2px solid #f39c12; margin-bottom: 5px; }
+        
+        .game-container { display: flex; gap: 10px; justify-content: center; align-items: stretch; height: 100%; }
+        .panel, .board-container { background: white; padding: 10px; border-radius: 10px; border: 2px solid #b0c4de; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .panel { flex: 0 0 300px; display: flex; flex-direction: column; text-align: left; }
+        .board-container { flex: 1; display: flex; justify-content: center; align-items: center; }
 
-        #game-screen { display: none; }
-        .hud { display: flex; justify-content: center; gap: 30px; margin-bottom: 10px; font-size: 20px; font-weight: bold; background: #ffe0b2; padding: 10px; border-radius: 10px; display: inline-flex;}
-        .score { color: #e67e22; }
+        #commands { font-size: 20px; min-height: 40px; padding: 5px; background: #f9f9f9; border: 2px dashed #ccc; margin-bottom: 5px; }
+        .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+        button { cursor: pointer; border-radius: 8px; border: none; background-color: #4CAF50; color: white; font-weight: bold; padding: 8px; }
+        .btn-run { background-color: #008CBA; padding: 10px; }
+        .btn-creator { background-color: #9c27b0; display: none; padding: 10px; margin-top: 5px; }
         
-        #game-board { display: grid; gap: 5px; justify-content: center; margin: 10px auto; width: max-content; background-color: #e0eaf5; padding: 10px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .cell { width: 60px; height: 60px; background-color: #fff; border: 2px solid #b0c4de; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 35px; position: relative; }
-        .crash { background-color: #ffcccc; border-color: #ff0000; }
-        
-        .controls, .actions { margin-top: 15px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;}
-        button { font-size: 18px; padding: 10px 15px; cursor: pointer; border-radius: 10px; border: none; background-color: #4CAF50; color: white; box-shadow: 0 4px #999; font-weight: bold; transition: transform 0.1s; }
-        button:active { box-shadow: 0 2px #666; transform: translateY(2px); }
-        
-        .btn-run { background-color: #008CBA; font-size: 20px; padding: 12px 20px;}
-        .btn-reset { background-color: #f44336; }
-        .btn-delete { background-color: #ff9800; }
-        
-        #commands { font-size: 24px; min-height: 40px; margin: 10px auto; padding: 10px; background: white; border-radius: 10px; display: inline-block; min-width: 300px; max-width: 80%; border: 2px dashed #ccc; word-wrap: break-word; }
+        #game-board { display: grid; gap: 3px; justify-content: center; }
+        .cell { width: 45px; height: 45px; background-color: #fff; border: 2px solid #b0c4de; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .crash { background-color: #ffcccc; }
     </style>
 </head>
 <body>
@@ -42,62 +41,62 @@
         <button class="char-btn" onclick="startGame('🐱', '🐟')">🐱</button>
         <button class="char-btn" onclick="startGame('🐶', '🦴')">🐶</button>
         <button class="char-btn" onclick="startGame('👽', '🛸')">👽</button>
-        <button class="char-btn" onclick="startGame('🦄', '🌈')">🦄</button>
-        <button class="char-btn" onclick="startGame('🦖', '🥩')">🦖</button>
     </div>
 
-    <div id="game-screen">
-        <h2 id="level-title">Nivel 1</h2>
-        <div class="hud"><div class="score">Estrellas: <span id="score-display">0</span> ⭐</div></div>
-        <div id="game-board"></div>
-        <div><h3>Secuencia:</h3><div id="commands"></div></div>
-        <div class="controls">
-            <button onclick="addCommand('ARRIBA')">⬆️ Arriba</button>
-            <button onclick="addCommand('ABAJO')">⬇️ Abajo</button>
-            <button onclick="addCommand('IZQUIERDA')">⬅️ Izquierda</button>
-            <button onclick="addCommand('DERECHA')">➡️ Derecha</button>
-            <button class="btn-delete" onclick="deleteLastCommand()">🔙 Borrar 1</button>
+    <div id="game-screen" style="display:none;">
+        <div class="header-bar">
+            <span id="level-title">Nivel 1</span> | Estrellas: <span id="score-display">0</span> ⭐
         </div>
-        <div class="actions">
-            <button class="btn-run" onclick="runCommands()">▶️ EJECUTAR</button>
-            <button class="btn-reset" onclick="resetLevel()">🔄 Reiniciar Nivel</button>
-            <button class="btn-reset" onclick="location.reload()" style="background-color: #607d8b;">⬅️ Cambiar Personaje</button>
+
+        <div class="game-container">
+            <div class="panel">
+                <div id="commands"></div>
+                <div class="controls-grid">
+                    <button onclick="addCommand('ARRIBA')">⬆️ Arriba</button>
+                    <button onclick="addCommand('ABAJO')">⬇️ Abajo</button>
+                    <button onclick="addCommand('IZQUIERDA')">⬅️ Izq</button>
+                    <button onclick="addCommand('DERECHA')">➡️ Der</button>
+                    <button onclick="deleteLastCommand()" style="background:#ff9800; grid-column: span 2;">🔙 Borrar</button>
+                </div>
+                <button class="btn-run" onclick="runCommands()" style="margin-top:10px;">▶️ EJECUTAR</button>
+                <button onclick="resetLevel()" style="background:#f44336; margin-top:5px;">🔄 Reiniciar</button>
+                <button id="btn-creator" class="btn-creator" onclick="enterCreatorMode()">🛠️ Modo Creador</button>
+            </div>
+
+            <div class="board-container">
+                <div id="game-board"></div>
+            </div>
         </div>
     </div>
 
     <script>
-        let playerChar = '🤖'; let goalChar = '🔋'; let totalScore = 0; let collectedInLevel = [];
+        let playerChar = '🤖', goalChar = '🔋', totalScore = 0, collectedInLevel = [];
+        let isCreatorMode = false, currentTool = 'player';
         
         const levels = [
-            { title: "Nivel 1: Camino Libre", size: 5, start: {x: 0, y: 4}, goal: {x: 4, y: 0}, obstacles: [], coins: [{x: 2, y: 2}] },
-            { title: "Nivel 2: La primera roca", size: 5, start: {x: 0, y: 4}, goal: {x: 4, y: 0}, obstacles: [{x: 2, y: 2}], coins: [{x: 1, y: 2}, {x: 3, y: 2}] },
-            { title: "Nivel 3: El muro", size: 6, start: {x: 0, y: 5}, goal: {x: 5, y: 0}, obstacles: [{x: 2, y: 1}, {x: 2, y: 2}, {x: 2, y: 3}, {x: 2, y: 4}], coins: [{x: 1, y: 0}, {x: 3, y: 5}] },
-            { title: "Nivel 4: Forma de S", size: 6, start: {x: 0, y: 0}, goal: {x: 5, y: 5}, obstacles: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 3, y: 5}, {x: 3, y: 4}, {x: 3, y: 3}], coins: [{x: 2, y: 0}, {x: 2, y: 5}] },
-            { title: "Nivel 5: La Herradura", size: 6, start: {x: 2, y: 5}, goal: {x: 2, y: 1}, obstacles: [{x: 1, y: 2}, {x: 1, y: 3}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 3, y: 4}, {x: 3, y: 3}, {x: 3, y: 2}], coins: [{x: 0, y: 0}, {x: 4, y: 0}] },
-            { title: "Nivel 6: Pasillo Largo", size: 7, start: {x: 0, y: 6}, goal: {x: 6, y: 0}, obstacles: [{x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 1, y: 4}, {x: 1, y: 5}, {x: 5, y: 1}, {x: 5, y: 2}, {x: 5, y: 3}, {x: 5, y: 4}, {x: 5, y: 5}], coins: [{x: 3, y: 1}, {x: 3, y: 5}] },
-            { title: "Nivel 7: Zig Zag", size: 7, start: {x: 0, y: 0}, goal: {x: 6, y: 6}, obstacles: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 3, y: 6}, {x: 3, y: 5}, {x: 3, y: 4}, {x: 5, y: 0}, {x: 5, y: 1}, {x: 5, y: 2}], coins: [{x: 2, y: 3}, {x: 4, y: 3}] },
-            { title: "Nivel 8: El Caracol", size: 7, start: {x: 0, y: 6}, goal: {x: 3, y: 3}, obstacles: [{x: 1, y: 4}, {x: 2, y: 4}, {x: 3, y: 4}, {x: 4, y: 4}, {x: 5, y: 4}, {x: 5, y: 3}, {x: 5, y: 2}, {x: 4, y: 2}, {x: 3, y: 2}, {x: 2, y: 2}, {x: 2, y: 3}], coins: [{x: 0, y: 0}, {x: 6, y: 0}, {x: 6, y: 6}] },
-            { title: "Nivel 9: Lluvia de Rocas", size: 7, start: {x: 0, y: 3}, goal: {x: 6, y: 3}, obstacles: [{x: 1, y: 1}, {x: 1, y: 5}, {x: 2, y: 3}, {x: 3, y: 1}, {x: 3, y: 5}, {x: 4, y: 3}, {x: 5, y: 1}, {x: 5, y: 5}, {x: 3, y: 3}], coins: [{x: 2, y: 1}, {x: 4, y: 5}] },
-            { title: "Nivel 10: El Laberinto Final", size: 7, start: {x: 0, y: 0}, goal: {x: 6, y: 6}, obstacles: [{x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 4, y: 0}, {x: 4, y: 1}, {x: 4, y: 2}, {x: 4, y: 3}, {x: 2, y: 3}, {x: 2, y: 4}, {x: 2, y: 5}, {x: 3, y: 5}, {x: 4, y: 5}, {x: 6, y: 5}, {x: 6, y: 4}], coins: [{x: 0, y: 6}, {x: 6, y: 0}, {x: 3, y: 3}] }
+            { title: "Nivel 1", size: 5, start: {x: 0, y: 4}, goal: {x: 4, y: 0}, obstacles: [], coins: [{x: 2, y: 2}] },
+            { title: "Nivel 2", size: 5, start: {x: 0, y: 4}, goal: {x: 4, y: 0}, obstacles: [{x: 2, y: 2}], coins: [{x: 1, y: 2}, {x: 3, y: 2}] },
+            { title: "Nivel 3", size: 6, start: {x: 0, y: 5}, goal: {x: 5, y: 0}, obstacles: [{x: 2, y: 1}, {x: 2, y: 2}, {x: 2, y: 3}, {x: 2, y: 4}], coins: [{x: 1, y: 0}, {x: 3, y: 5}] },
+            { title: "Nivel 4", size: 6, start: {x: 0, y: 0}, goal: {x: 5, y: 5}, obstacles: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 3, y: 5}, {x: 3, y: 4}, {x: 3, y: 3}], coins: [{x: 2, y: 0}, {x: 2, y: 5}] },
+            { title: "Nivel 5", size: 7, start: {x: 0, y: 6}, goal: {x: 6, y: 0}, obstacles: [{x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 1, y: 4}, {x: 1, y: 5}], coins: [{x: 3, y: 1}, {x: 3, y: 5}] }
         ];
 
-        let currentLevelIdx = 0; let boardSize = 5; let playerPos = {x: 0, y: 0}; let goalPos = {x: 0, y: 0};
-        let obstacles = []; let coins = []; let commands = []; let isRunning = false;
+        let currentLevelIdx = 0, boardSize = 5, playerPos = {x: 0, y: 0}, goalPos = {x: 0, y: 0};
+        let obstacles = [], coins = [], commands = [], isRunning = false;
 
-        function startGame(char, goal) { playerChar = char; goalChar = goal; document.getElementById('selection-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'block'; loadLevel(); }
-
+        function startGame(char, goal) { playerChar = char; goalChar = goal; document.getElementById('selection-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; loadLevel(); }
+        function setupBoardGrid() { const board = document.getElementById('game-board'); board.style.gridTemplateColumns = `repeat(${boardSize}, 45px)`; board.style.gridTemplateRows = `repeat(${boardSize}, 45px)`; }
+        
         function loadLevel() {
+            if(isCreatorMode) return;
             const level = levels[currentLevelIdx];
             document.getElementById('level-title').innerText = level.title;
-            boardSize = level.size; playerPos = { ...level.start }; goalPos = { ...level.goal };
-            obstacles = level.obstacles; coins = level.coins.map(c => ({...c})); collectedInLevel = [];
+            boardSize = level.size; playerPos = {...level.start}; goalPos = {...level.goal};
+            obstacles = [...level.obstacles]; coins = [...level.coins]; collectedInLevel = [];
             commands = []; isRunning = false;
             document.getElementById('commands').innerText = '';
             document.getElementById('score-display').innerText = totalScore;
-            const board = document.getElementById('game-board');
-            board.style.gridTemplateColumns = `repeat(${boardSize}, 60px)`;
-            board.style.gridTemplateRows = `repeat(${boardSize}, 60px)`;
-            drawBoard();
+            setupBoardGrid(); drawBoard();
         }
 
         function drawBoard(crash = false) {
@@ -105,10 +104,10 @@
             for (let y = 0; y < boardSize; y++) {
                 for (let x = 0; x < boardSize; x++) {
                     let cell = document.createElement('div'); cell.className = 'cell';
-                    if (x === playerPos.x && y === playerPos.y) { cell.innerHTML = crash ? '💥' : playerChar; if (crash) cell.classList.add('crash'); }
-                    else if (x === goalPos.x && y === goalPos.y) { cell.innerHTML = goalChar; }
-                    else if (obstacles.some(o => o.x === x && o.y === y)) { cell.innerHTML = '🪨'; }
-                    else if (coins.some(c => c.x === x && c.y === y)) { cell.innerHTML = '⭐'; }
+                    if (x === playerPos.x && y === playerPos.y) { cell.innerHTML = crash ? '💥' : playerChar; if(crash) cell.classList.add('crash'); }
+                    else if (x === goalPos.x && y === goalPos.y) cell.innerHTML = goalChar;
+                    else if (obstacles.some(o => o.x === x && o.y === y)) cell.innerHTML = '🪨';
+                    else if (coins.some(c => c.x === x && c.y === y)) cell.innerHTML = '⭐';
                     board.appendChild(cell);
                 }
             }
@@ -116,28 +115,20 @@
 
         function addCommand(cmd) { if(!isRunning) { commands.push(cmd); updateDisplay(); } }
         function deleteLastCommand() { if(!isRunning && commands.length > 0) { commands.pop(); updateDisplay(); } }
-        function updateDisplay() {
-            let symbols = commands.map(c => ({'ARRIBA':'⬆️','ABAJO':'⬇️','IZQUIERDA':'⬅️','DERECHA':'➡️'}[c]));
-            document.getElementById('commands').innerText = symbols.join(' ');
-        }
+        function updateDisplay() { let sym = {'ARRIBA':'⬆️','ABAJO':'⬇️','IZQUIERDA':'⬅️','DERECHA':'➡️'}; document.getElementById('commands').innerText = commands.map(c => sym[c]).join(' '); }
 
         function runCommands() {
             if(commands.length === 0 || isRunning) return;
             isRunning = true;
-            
             let i = 0;
             let interval = setInterval(() => {
                 if (i >= commands.length) { clearInterval(interval); checkWin(); return; }
-                
                 let cmd = commands[i]; let nextX = playerPos.x; let nextY = playerPos.y;
                 if (cmd === 'ARRIBA') nextY--; if (cmd === 'ABAJO') nextY++; if (cmd === 'IZQUIERDA') nextX--; if (cmd === 'DERECHA') nextX++;
 
                 if (nextX < 0 || nextX >= boardSize || nextY < 0 || nextY >= boardSize || obstacles.some(o => o.x === nextX && o.y === nextY)) {
-                    clearInterval(interval); drawBoard(true);
-                    setTimeout(() => { alert("¡Oh no! Fallaste. Reiniciando nivel..."); loadLevel(); }, 100);
-                    return;
+                    clearInterval(interval); drawBoard(true); setTimeout(() => { alert("¡Oh no!"); loadLevel(); }, 100); return;
                 }
-                
                 playerPos.x = nextX; playerPos.y = nextY;
                 let cIdx = coins.findIndex(c => c.x === playerPos.x && c.y === playerPos.y);
                 if (cIdx !== -1) { coins.splice(cIdx, 1); collectedInLevel.push(1); document.getElementById('score-display').innerText = totalScore + collectedInLevel.length; }
@@ -149,10 +140,10 @@
             if (playerPos.x === goalPos.x && playerPos.y === goalPos.y) {
                 totalScore += collectedInLevel.length;
                 setTimeout(() => {
-                    if (currentLevelIdx < levels.length - 1) { alert("¡Felicidades!"); currentLevelIdx++; loadLevel(); }
-                    else { alert(`🏆 ¡Maestro Programador! 🏆 Total: ${totalScore} estrellas`); totalScore=0; currentLevelIdx=0; loadLevel(); }
+                    if (currentLevelIdx < levels.length - 1) { currentLevelIdx++; loadLevel(); }
+                    else { alert("¡Ganaste todo!"); document.getElementById('btn-creator').style.display = 'block'; currentLevelIdx=0; loadLevel(); }
                 }, 200);
-            } else { setTimeout(() => { alert("No llegaste a la meta. ¡Reiniciando nivel!"); loadLevel(); }, 200); }
+            } else { setTimeout(() => { alert("No llegaste."); loadLevel(); }, 200); }
         }
 
         function resetLevel() { if(!isRunning) loadLevel(); }
