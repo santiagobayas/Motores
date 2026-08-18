@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¡El Mundo de los Motores! 🤖</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F4F9FF;
+      --card-bg: #FFFFFF;
+      --primary: #FF5964;
+      --secondary: #35A7FF;
+      --accent: #FFD166;
+      --text: #2E4057;
+      --green: #06D6A0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Fredoka', cursive, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    #presentation-container {
+      width: 90vw;
+      max-width: 800px;
+      height: 75vh;
+      background: var(--card-bg);
+      border-radius: 28px;
+      box-shadow: 0 15px 35px rgba(53, 167, 255, 0.15);
+      border: 5px solid var(--accent);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.9) translateY(20px);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: all;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+
+    h2 {
+      font-size: 2.2rem;
+      color: var(--secondary);
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.4rem;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .emoji-big {
+      font-size: 5rem;
+      margin-bottom: 15px;
+      animation: bounce 2s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .interactive-box {
+      background: #EDF6F9;
+      padding: 20px 30px;
+      border-radius: 20px;
+      margin: 10px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .fan-blade {
+      font-size: 4rem;
+      display: inline-block;
+      transition: transform 0.1s linear;
+    }
+
+    .spinning {
+      animation: spin 0.4s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .interactive-btn {
+      background: var(--green);
+      color: white;
+      border: none;
+      font-size: 1.3rem;
+      padding: 12px 25px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 6px 0 #049f77;
+      transition: transform 0.1s;
+    }
+
+    .interactive-btn:active {
+      transform: translateY(6px);
+      box-shadow: none;
+    }
+
+    .cards-container {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .mini-card {
+      background: #FFF;
+      border: 3px solid var(--secondary);
+      border-radius: 15px;
+      padding: 15px;
+      width: 120px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .mini-card:hover {
+      transform: scale(1.08);
+    }
+
+    #controls {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .nav-btn {
+      background: var(--secondary);
+      color: white;
+      border: none;
+      font-size: 1.5rem;
+      padding: 12px 28px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 6px 0 #2176bd;
+      transition: transform 0.1s;
+    }
+
+    .nav-btn:active {
+      transform: translateY(6px);
+      box-shadow: none;
+    }
+
+    .nav-btn:disabled {
+      background: #ccc;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #progress-dots {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      background: #cddbe8;
+      border-radius: 50%;
+      transition: background 0.3s;
+    }
+
+    .dot.active {
+      background: var(--primary);
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="presentation-container">
+    
+    <!-- Slide 1: Bienvenida -->
+    <div class="slide active">
+      <div class="emoji-big">🤖⚡</div>
+      <h1>¡El Superpoder de los Robots!</h1>
+      <p>Hoy vamos a descubrir la parte más divertida de la robótica...</p>
+      <p><strong>¿Cómo hacen los robots para moverse? 🦾</strong></p>
+    </div>
+
+    <!-- Slide 2: El Motor -->
+    <div class="slide">
+      <div class="emoji-big">⚙️</div>
+      <h2>¿Qué es un Motor?</h2>
+      <p>Un motor es como el <strong>corazón 🫀</strong> o los <strong>músculos 💪</strong> de los juguetes y los robots.</p>
+      <p>¡Toma la energía de una batería y la transforma en <strong>MOVIMIENTO</strong>!</p>
+    </div>
+
+    <!-- Slide 3: ¿Dónde los vemos? -->
+    <div class="slide">
+      <h2>¡Detectives de Motores! 🕵️‍♂️</h2>
+      <p>Toca cada objeto para descubrir su superpoder con motor:</p>
+      <div class="cards-container">
+        <div class="mini-card" onclick="alert('🚗 ¡Hace girar las ruedas para ir muy rápido!')">
+          <div style="font-size: 2rem;">🏎️</div>
+          Auto
+        </div>
+        <div class="mini-card" onclick="alert('🚁 ¡Gira las hélices para volar alto!')">
+          <div style="font-size: 2rem;">🚁</div>
+          Helicóptero
+        </div>
+        <div class="mini-card" onclick="alert('🌪️ ¡Mueve sus aspas para darnos aire fresco!')">
+          <div style="font-size: 2rem;">🌀</div>
+          Ventilador
+        </div>
+        <div class="mini-card" onclick="alert('🤖 ¡Mueve sus brazos y piernas!')">
+          <div style="font-size: 2rem;">🦾</div>
+          Brazo Robot
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: Interactivo -->
+    <div class="slide">
+      <h2>¡Probemos un Motor Real! 🚀</h2>
+      <p>Dale energía al motor para ver qué pasa con las aspas:</p>
+      <div class="interactive-box">
+        <div class="fan-blade" id="motorBlade">⚙️</div>
+        <button class="interactive-btn" id="motorBtn" onclick="toggleMotor()">🔌 ¡ENCENDER ENERGÍA!</button>
+      </div>
+      <p id="motorStatus" style="font-size: 1.1rem; color: #666;">El motor está descansando...</p>
+    </div>
+
+    <!-- Slide 5: Despedida -->
+    <div class="slide">
+      <div class="emoji-big">🎉</div>
+      <h1>¡Misión Cumplida!</h1>
+      <p>¡Ahora ya son expertos en motores!</p>
+      <p style="font-size: 1.6rem; color: var(--green);"><strong>¡A construir y darle vida a nuestros robots! 🛠️🤖</strong></p>
+    </div>
+
+  </div>
+
+  <div id="controls">
+    <button class="nav-btn" id="prevBtn" onclick="moveSlide(-1)" disabled>⬅️ Atrás</button>
+    <button class="nav-btn" id="nextBtn" onclick="moveSlide(1)">Siguiente ➡️</button>
+  </div>
+
+  <div id="progress-dots">
+    <div class="dot active"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function updatePresentation() {
+      slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === currentSlide);
+      });
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+      });
+
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === slides.length - 1;
+    }
+
+    function moveSlide(direction) {
+      currentSlide += direction;
+      updatePresentation();
+    }
+
+    let isMotorRunning = false;
+    function toggleMotor() {
+      const blade = document.getElementById('motorBlade');
+      const btn = document.getElementById('motorBtn');
+      const status = document.getElementById('motorStatus');
+
+      isMotorRunning = !isMotorRunning;
+
+      if (isMotorRunning) {
+        blade.classList.add('spinning');
+        blade.innerText = '🌀';
+        btn.innerText = '🛑 ¡APAGAR!';
+        btn.style.background = '#FF5964';
+        status.innerText = '⚡ ¡El motor está girando a toda velocidad!';
+      } else {
+        blade.classList.remove('spinning');
+        blade.innerText = '⚙️';
+        btn.innerText = '🔌 ¡ENCENDER ENERGÍA!';
+        btn.style.background = '#06D6A0';
+        status.innerText = 'El motor está descansando...';
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' && currentSlide < slides.length - 1) moveSlide(1);
+      if (e.key === 'ArrowLeft' && currentSlide > 0) moveSlide(-1);
+    });
+  </script>
+</body>
+</html>
