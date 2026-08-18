@@ -7,28 +7,30 @@
     <style>
         body { font-family: 'Comic Sans MS', cursive, sans-serif; background-color: #f0f8ff; color: #333; margin: 0; padding: 5px; text-align: center; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* Selección */
+        /* Menú Principal */
         #selection-screen { margin-top: 10px; }
         .char-btn { font-size: 35px; padding: 10px 15px; margin: 5px; cursor: pointer; border-radius: 10px; border: 2px solid #b0c4de; background: white; }
-        
-        /* Juego */
-        #game-screen { display: none; height: 95vh; display: flex; flex-direction: column; }
+        .menu-btn { font-size: 20px; padding: 15px 30px; margin: 10px; cursor: pointer; border-radius: 15px; border: 2px solid #4CAF50; background: #e8f5e9; font-weight: bold; }
+
+        /* Pantalla Juego */
+        #game-screen { display: none; height: 95vh; flex-direction: column; }
         .header-bar { background: #ffe0b2; padding: 5px 15px; border-radius: 10px; font-weight: bold; font-size: 18px; border: 2px solid #f39c12; margin-bottom: 5px; }
         
-        .game-container { display: flex; gap: 10px; justify-content: center; align-items: stretch; height: 100%; }
-        .panel, .board-container { background: white; padding: 10px; border-radius: 10px; border: 2px solid #b0c4de; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .panel { flex: 0 0 300px; display: flex; flex-direction: column; text-align: left; }
-        .board-container { flex: 1; display: flex; justify-content: center; align-items: center; }
+        .game-container { display: flex; gap: 10px; justify-content: center; align-items: stretch; height: 100%; position: relative; }
+        .panel { flex: 0 0 280px; background: white; padding: 10px; border-radius: 10px; border: 2px solid #b0c4de; display: flex; flex-direction: column; text-align: left; }
+        .board-container { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; background: white; padding: 10px; border-radius: 10px; border: 2px solid #b0c4de; }
 
-        #commands { font-size: 20px; min-height: 40px; padding: 5px; background: #f9f9f9; border: 2px dashed #ccc; margin-bottom: 5px; }
+        #commands { font-size: 18px; height: 40px; padding: 5px; background: #f9f9f9; border: 2px dashed #ccc; margin-bottom: 5px; }
         .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
         button { cursor: pointer; border-radius: 8px; border: none; background-color: #4CAF50; color: white; font-weight: bold; padding: 8px; }
-        .btn-run { background-color: #008CBA; padding: 10px; }
-        .btn-creator { background-color: #9c27b0; display: none; padding: 10px; margin-top: 5px; }
         
         #game-board { display: grid; gap: 3px; justify-content: center; }
-        .cell { width: 45px; height: 45px; background-color: #fff; border: 2px solid #b0c4de; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
-        .crash { background-color: #ffcccc; }
+        .cell { width: 42px; height: 42px; background-color: #fff; border: 2px solid #b0c4de; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        
+        #feedback-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10; font-size: 30px; font-weight: bold; color: #4CAF50; }
+        #creator-tools { display: none; background: #f3e5f5; padding: 5px; border-radius: 10px; border: 2px solid #9c27b0; margin-bottom: 5px;}
+        .tool-btn { font-size: 20px; padding: 2px 8px; background: white; border: 2px solid transparent;}
+        .tool-btn.active { border-color: #9c27b0; background: #e1bee7; }
     </style>
 </head>
 <body>
@@ -36,21 +38,33 @@
     <h1>Aventuras de Programación</h1>
 
     <div id="selection-screen">
-        <h2>¿Con quién quieres jugar hoy?</h2>
-        <button class="char-btn" onclick="startGame('🤖', '🔋')">🤖</button>
-        <button class="char-btn" onclick="startGame('🐱', '🐟')">🐱</button>
-        <button class="char-btn" onclick="startGame('🐶', '🦴')">🐶</button>
-        <button class="char-btn" onclick="startGame('👽', '🛸')">👽</button>
+        <h2>Elige tu personaje:</h2>
+        <button class="char-btn" onclick="selectChar('🤖', '🔋')">🤖</button>
+        <button class="char-btn" onclick="selectChar('🐱', '🐟')">🐱</button>
+        <button class="char-btn" onclick="selectChar('🐶', '🦴')">🐶</button>
+        <button class="char-btn" onclick="selectChar('👽', '🛸')">👽</button>
+        <button class="char-btn" onclick="selectChar('🦄', '🌈')">🦄</button>
+        <button class="char-btn" onclick="selectChar('🦖', '🥩')">🦖</button>
+        <div style="margin-top: 20px;">
+            <button class="menu-btn" onclick="initGame(false)">▶️ JUGAR NIVELES</button>
+            <button class="menu-btn" onclick="initGame(true)" style="border-color:#9c27b0; background:#f3e5f5;">🛠️ MODO CREADOR</button>
+        </div>
     </div>
 
-    <div id="game-screen" style="display:none;">
+    <div id="game-screen">
         <div class="header-bar">
             <span id="level-title">Nivel 1</span> | Estrellas: <span id="score-display">0</span> ⭐
         </div>
-
         <div class="game-container">
             <div class="panel">
                 <div id="commands"></div>
+                <div id="creator-tools">
+                    <button class="tool-btn active" onclick="setTool('player')" id="tool-player">🤖</button>
+                    <button class="tool-btn" onclick="setTool('goal')" id="tool-goal">🔋</button>
+                    <button class="tool-btn" onclick="setTool('rock')" id="tool-rock">🪨</button>
+                    <button class="tool-btn" onclick="setTool('star')" id="tool-star">⭐</button>
+                    <button class="tool-btn" onclick="setTool('eraser')" id="tool-eraser">🧹</button>
+                </div>
                 <div class="controls-grid">
                     <button onclick="addCommand('ARRIBA')">⬆️ Arriba</button>
                     <button onclick="addCommand('ABAJO')">⬇️ Abajo</button>
@@ -58,95 +72,75 @@
                     <button onclick="addCommand('DERECHA')">➡️ Der</button>
                     <button onclick="deleteLastCommand()" style="background:#ff9800; grid-column: span 2;">🔙 Borrar</button>
                 </div>
-                <button class="btn-run" onclick="runCommands()" style="margin-top:10px;">▶️ EJECUTAR</button>
-                <button onclick="resetLevel()" style="background:#f44336; margin-top:5px;">🔄 Reiniciar</button>
-                <button id="btn-creator" class="btn-creator" onclick="enterCreatorMode()">🛠️ Modo Creador</button>
+                <button onclick="runCommands()" style="background:#008CBA; padding:10px; margin-top:5px;">▶️ EJECUTAR</button>
+                <button onclick="location.reload()" style="background:#607d8b; margin-top:5px;">🏠 Menú Principal</button>
             </div>
-
             <div class="board-container">
                 <div id="game-board"></div>
+                <div id="feedback-modal"></div>
             </div>
         </div>
     </div>
 
     <script>
-        let playerChar = '🤖', goalChar = '🔋', totalScore = 0, collectedInLevel = [];
-        let isCreatorMode = false, currentTool = 'player';
-        
-        const levels = [
-            { title: "Nivel 1", size: 5, start: {x: 0, y: 4}, goal: {x: 4, y: 0}, obstacles: [], coins: [{x: 2, y: 2}] },
-            { title: "Nivel 2", size: 5, start: {x: 0, y: 4}, goal: {x: 4, y: 0}, obstacles: [{x: 2, y: 2}], coins: [{x: 1, y: 2}, {x: 3, y: 2}] },
-            { title: "Nivel 3", size: 6, start: {x: 0, y: 5}, goal: {x: 5, y: 0}, obstacles: [{x: 2, y: 1}, {x: 2, y: 2}, {x: 2, y: 3}, {x: 2, y: 4}], coins: [{x: 1, y: 0}, {x: 3, y: 5}] },
-            { title: "Nivel 4", size: 6, start: {x: 0, y: 0}, goal: {x: 5, y: 5}, obstacles: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 3, y: 5}, {x: 3, y: 4}, {x: 3, y: 3}], coins: [{x: 2, y: 0}, {x: 2, y: 5}] },
-            { title: "Nivel 5", size: 7, start: {x: 0, y: 6}, goal: {x: 6, y: 0}, obstacles: [{x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 1, y: 4}, {x: 1, y: 5}], coins: [{x: 3, y: 1}, {x: 3, y: 5}] }
-        ];
+        let pChar='🤖', gChar='🔋', totalScore=0, collected=0, isCreator=false, currentTool='player', curLvl=0;
+        let pPos={x:0,y:0}, gPos={x:0,y:0}, obs=[], coins=[], cmds=[], isRunning=false;
 
-        let currentLevelIdx = 0, boardSize = 5, playerPos = {x: 0, y: 0}, goalPos = {x: 0, y: 0};
-        let obstacles = [], coins = [], commands = [], isRunning = false;
+        function selectChar(c, g) { pChar=c; gChar=g; document.getElementById('tool-player').innerText=c; document.getElementById('tool-goal').innerText=g; }
+        function initGame(creator) { isCreator=creator; document.getElementById('selection-screen').style.display='none'; document.getElementById('game-screen').style.display='flex'; isCreator ? enterCreator() : loadLevel(); }
 
-        function startGame(char, goal) { playerChar = char; goalChar = goal; document.getElementById('selection-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; loadLevel(); }
-        function setupBoardGrid() { const board = document.getElementById('game-board'); board.style.gridTemplateColumns = `repeat(${boardSize}, 45px)`; board.style.gridTemplateRows = `repeat(${boardSize}, 45px)`; }
-        
+        function enterCreator() {
+            document.getElementById('level-title').innerText="🛠️ Modo Creador";
+            document.getElementById('creator-tools').style.display='block';
+            boardSize=7; pPos={x:0,y:6}; gPos={x:6,y:0}; obs=[]; coins=[]; cmds=[];
+            setupBoard(7); draw();
+        }
+
         function loadLevel() {
-            if(isCreatorMode) return;
-            const level = levels[currentLevelIdx];
-            document.getElementById('level-title').innerText = level.title;
-            boardSize = level.size; playerPos = {...level.start}; goalPos = {...level.goal};
-            obstacles = [...level.obstacles]; coins = [...level.coins]; collectedInLevel = [];
-            commands = []; isRunning = false;
-            document.getElementById('commands').innerText = '';
-            document.getElementById('score-display').innerText = totalScore;
-            setupBoardGrid(); drawBoard();
+            const lvl = [{title:"Nivel 1",size:5,s:{x:0,y:4},g:{x:4,y:0},o:[],c:[{x:2,y:2}]},{title:"Nivel 2",size:5,s:{x:0,y:4},g:{x:4,y:0},o:[{x:2,y:2}],c:[{x:1,y:2},{x:3,y:2}]},{title:"Nivel 3",size:6,s:{x:0,y:5},g:{x:5,y:0},o:[{x:2,y:1},{x:2,y:2},{x:2,y:3},{x:2,y:4}],c:[{x:1,y:0},{x:3,y:5}]}][curLvl];
+            document.getElementById('level-title').innerText=lvl.title;
+            boardSize=lvl.size; pPos={...lvl.s}; gPos={...lvl.g}; obs=[...lvl.o]; coins=[...lvl.c]; collected=0; cmds=[];
+            setupBoard(boardSize); draw();
         }
 
-        function drawBoard(crash = false) {
-            const board = document.getElementById('game-board'); board.innerHTML = '';
-            for (let y = 0; y < boardSize; y++) {
-                for (let x = 0; x < boardSize; x++) {
-                    let cell = document.createElement('div'); cell.className = 'cell';
-                    if (x === playerPos.x && y === playerPos.y) { cell.innerHTML = crash ? '💥' : playerChar; if(crash) cell.classList.add('crash'); }
-                    else if (x === goalPos.x && y === goalPos.y) cell.innerHTML = goalChar;
-                    else if (obstacles.some(o => o.x === x && o.y === y)) cell.innerHTML = '🪨';
-                    else if (coins.some(c => c.x === x && c.y === y)) cell.innerHTML = '⭐';
-                    board.appendChild(cell);
-                }
-            }
+        function setupBoard(s) { const b=document.getElementById('game-board'); b.style.gridTemplateColumns=`repeat(${s}, 45px)`; b.style.gridTemplateRows=`repeat(${s}, 45px)`; }
+        function draw(crash=false) {
+            const b=document.getElementById('game-board'); b.innerHTML='';
+            for(let y=0;y<boardSize;y++){ for(let x=0;x<boardSize;x++){
+                let c=document.createElement('div'); c.className='cell'; c.onclick=()=>handle(x,y);
+                if(x===pPos.x && y===pPos.y) c.innerHTML=crash?'💥':pChar;
+                else if(x===gPos.x && y===gPos.y) c.innerHTML=gChar;
+                else if(obs.some(o=>o.x===x && o.y===y)) c.innerHTML='🪨';
+                else if(coins.some(i=>i.x===x && i.y===y)) c.innerHTML='⭐';
+                b.appendChild(c);
+            }}
         }
 
-        function addCommand(cmd) { if(!isRunning) { commands.push(cmd); updateDisplay(); } }
-        function deleteLastCommand() { if(!isRunning && commands.length > 0) { commands.pop(); updateDisplay(); } }
-        function updateDisplay() { let sym = {'ARRIBA':'⬆️','ABAJO':'⬇️','IZQUIERDA':'⬅️','DERECHA':'➡️'}; document.getElementById('commands').innerText = commands.map(c => sym[c]).join(' '); }
+        function handle(x, y) { if(!isCreator || isRunning) return; obs=obs.filter(o=>o.x!==x||o.y!==y); coins=coins.filter(i=>i.x!==x||i.y!==y); if(currentTool==='player') pPos={x,y}; else if(currentTool==='goal') gPos={x,y}; else if(currentTool==='rock') obs.push({x,y}); else if(currentTool==='star') coins.push({x,y}); draw(); }
+        function setTool(t) { currentTool=t; document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active')); document.getElementById('tool-'+t).classList.add('active'); }
+        function addCommand(c) { if(!isRunning) { cmds.push(c); document.getElementById('commands').innerText=cmds.map(x=>{'ARRIBA':'⬆️','ABAJO':'⬇️','IZQUIERDA':'⬅️','DERECHA':'➡️'}[x]).join(' '); } }
+        function deleteLastCommand() { cmds.pop(); updateDisplay(); }
+        function updateDisplay() { document.getElementById('commands').innerText=cmds.map(x=>{'ARRIBA':'⬆️','ABAJO':'⬇️','IZQUIERDA':'⬅️','DERECHA':'➡️'}[x]).join(' '); }
 
         function runCommands() {
-            if(commands.length === 0 || isRunning) return;
-            isRunning = true;
-            let i = 0;
-            let interval = setInterval(() => {
-                if (i >= commands.length) { clearInterval(interval); checkWin(); return; }
-                let cmd = commands[i]; let nextX = playerPos.x; let nextY = playerPos.y;
-                if (cmd === 'ARRIBA') nextY--; if (cmd === 'ABAJO') nextY++; if (cmd === 'IZQUIERDA') nextX--; if (cmd === 'DERECHA') nextX++;
-
-                if (nextX < 0 || nextX >= boardSize || nextY < 0 || nextY >= boardSize || obstacles.some(o => o.x === nextX && o.y === nextY)) {
-                    clearInterval(interval); drawBoard(true); setTimeout(() => { alert("¡Oh no!"); loadLevel(); }, 100); return;
-                }
-                playerPos.x = nextX; playerPos.y = nextY;
-                let cIdx = coins.findIndex(c => c.x === playerPos.x && c.y === playerPos.y);
-                if (cIdx !== -1) { coins.splice(cIdx, 1); collectedInLevel.push(1); document.getElementById('score-display').innerText = totalScore + collectedInLevel.length; }
-                drawBoard(); i++;
-            }, 500);
+            if(cmds.length===0 || isRunning) return;
+            isRunning=true; let i=0;
+            let int=setInterval(()=>{
+                if(i>=cmds.length){ clearInterval(int); checkWin(); return; }
+                let c=cmds[i], nx=pPos.x, ny=pPos.y;
+                if(c==='ARRIBA') ny--; if(c==='ABAJO') ny++; if(c==='IZQUIERDA') nx--; if(c==='DERECHA') nx++;
+                if(nx<0||nx>=boardSize||ny<0||ny>=boardSize||obs.some(o=>o.x===nx&&o.y===ny)){ clearInterval(int); draw(true); setTimeout(()=>{isRunning=false; isCreator ? (pPos={x:0,y:6}) : loadLevel(); draw();}, 800); return; }
+                pPos={x:nx,y:ny}; let ci=coins.findIndex(c=>c.x===pPos.x&&c.y===pPos.y); if(ci!==-1){ coins.splice(ci,1); collected++; document.getElementById('score-display').innerText=totalScore+collected; }
+                draw(); i++;
+            }, 400);
         }
 
         function checkWin() {
-            if (playerPos.x === goalPos.x && playerPos.y === goalPos.y) {
-                totalScore += collectedInLevel.length;
-                setTimeout(() => {
-                    if (currentLevelIdx < levels.length - 1) { currentLevelIdx++; loadLevel(); }
-                    else { alert("¡Ganaste todo!"); document.getElementById('btn-creator').style.display = 'block'; currentLevelIdx=0; loadLevel(); }
-                }, 200);
-            } else { setTimeout(() => { alert("No llegaste."); loadLevel(); }, 200); }
+            if(pPos.x===gPos.x && pPos.y===gPos.y){ 
+                const m=document.getElementById('feedback-modal'); m.style.display='flex'; m.innerText='¡Ganaste!';
+                setTimeout(()=>{ m.style.display='none'; if(!isCreator && curLvl<2){ curLvl++; loadLevel(); } else { alert('¡Nivel completado!'); isRunning=false; } }, 1000);
+            } else { alert('No llegaste'); isRunning=false; isCreator ? (pPos={x:0,y:6}) : loadLevel(); }
         }
-
-        function resetLevel() { if(!isRunning) loadLevel(); }
     </script>
 </body>
 </html>
